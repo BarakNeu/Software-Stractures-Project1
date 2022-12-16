@@ -1,6 +1,6 @@
-#username - complete info
-#id1      - complete info 
-#name1    - complete info 
+#username - omrikaplan
+#id1      - 319089256
+#name1    - Omri Kaplan
 #id2      - complete info
 #name2    - complete info  
 
@@ -15,6 +15,7 @@ class AVLNode(object):
 	@param value: data of your node
 	"""
 	def __init__(self, value):
+
 			self.value = value
 			self.left = None
 			self.right = None
@@ -23,10 +24,12 @@ class AVLNode(object):
 			self.height = -1 # Balance factor
 			self.is_ver_node = False
 
+
 	"""returns the left child
 	@rtype: AVLNode
 	@returns: the left child of self, None if there is no left child
 	"""
+
 	def getLeft(self):
 		return self.left
 
@@ -141,8 +144,19 @@ class AVLTreeList(object):
 	@returns: True if the list is empty, False otherwise
 	"""
 	def empty(self):
-		return None
-
+		if size == 0:
+			return True
+		return False
+	def tree_select(self, k):
+		return TreeSelectRec(self.root, k)
+	def tree_select_rec(self,k): ## make sure you dont return virtual leaf
+		r = self.left.size + 1
+		if k == r:
+			return self
+		elif k < r:
+			return tree_select_rec(self.left, k)
+		else:
+			return tree_select_rec(self.right, k-r)
 
 	"""retrieves the value of the i'th item in the list
 
@@ -153,7 +167,7 @@ class AVLTreeList(object):
 	@returns: the the value of the i'th item in the list
 	"""
 	def retrieve(self, i):
-		return None
+		return tree_select(self.root, i+1)
 
 	"""inserts val at position i in the list
 
@@ -166,6 +180,8 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def insert(self, i, val):
+		to_inset = AVLNode(val)
+
 		return -1
 
 
@@ -211,7 +227,7 @@ class AVLTreeList(object):
 	@returns: the size of the list
 	"""
 	def length(self):
-		return None
+		return self.size
 
 	"""sort the info values of the list
 
@@ -257,6 +273,6 @@ class AVLTreeList(object):
 	@returns: the root, None if the list is empty
 	"""
 	def getRoot(self):
-		return None
+		return self.root
 
 
