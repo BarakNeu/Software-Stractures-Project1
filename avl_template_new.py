@@ -21,7 +21,7 @@ class AVLNode(object):
 		self.parent = None
 		self.height = -1 # Balance factor
 		self.size = 0
-		
+		self.is_ver = False
 
 	"""returns the left child
 	@rtype: AVLNode
