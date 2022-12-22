@@ -2,35 +2,31 @@
 #id1      - 319089256
 #name1    - Omri Kaplan
 #id2      - complete info
-#name2    - complete info  
-
-
-
+#name2    - complete info
 """A class represnting a node in an AVL tree"""
-
+import math
+import random
+import sys
 class AVLNode(object):
-	"""Constructor, you are allowed to add more fields. 
-
+	"""Constructor, you are allowed to add more fields.
 	@type value: str
 	@param value: data of your node
 	"""
 	def __init__(self, value):
-
-			self.value = value
-			self.left = None
-			self.right = None
-			self.parent = None
-			self.size = 1
-			self.height = -1 # Balance factor
-			self.is_ver_node = False
-
+		self.value = value
+		self.left = None
+		self.right = None
+		self.parent = None
+		self.size = 1
+		self.height = -1 # Balance factor
+		self.is_real_node = True
 
 	"""returns the left child
 	@rtype: AVLNode
 	@returns: the left child of self, None if there is no left child
 	"""
 
-	def getLeft(self):
+	def getLeft(self):#works in 0(1)
 		return self.left
 
 
@@ -39,7 +35,7 @@ class AVLNode(object):
 	@rtype: AVLNode
 	@returns: the right child of self, None if there is no right child
 	"""
-	def getRight(self):
+	def getRight(self):#works in 0(1)
 		return self.right
 
 	"""returns the parent 
@@ -47,7 +43,7 @@ class AVLNode(object):
 	@rtype: AVLNode
 	@returns: the parent of self, None if there is no parent
 	"""
-	def getParent(self):
+	def getParent(self):#works in 0(1)
 		return self.parent
 
 	"""return the value
@@ -55,7 +51,7 @@ class AVLNode(object):
 	@rtype: str
 	@returns: the value of self, None if the node is virtual
 	"""
-	def getValue(self):
+	def getValue(self):#works in 0(1)
 		return self.value
 
 	"""returns the height
@@ -63,7 +59,7 @@ class AVLNode(object):
 	@rtype: int
 	@returns: the height of self, -1 if the node is virtual
 	"""
-	def getHeight(self):
+	def getHeight(self):#works in 0(1)
 		return self.height
 
 	"""sets left child
@@ -71,7 +67,7 @@ class AVLNode(object):
 	@type node: AVLNode
 	@param node: a node
 	"""
-	def setLeft(self, node):
+	def setLeft(self, node):#works in 0(1)
 		self.left = node
 		return None
 
@@ -80,7 +76,7 @@ class AVLNode(object):
 	@type node: AVLNode
 	@param node: a node
 	"""
-	def setRight(self, node):
+	def setRight(self, node):#works in 0(1)
 		self.right = node
 		return None
 
@@ -89,7 +85,7 @@ class AVLNode(object):
 	@type node: AVLNode
 	@param node: a node
 	"""
-	def setParent(self, node):
+	def setParent(self, node):#works in 0(1)
 		self.parent = node
 		return None
 
@@ -98,7 +94,7 @@ class AVLNode(object):
 	@type value: str
 	@param value: data
 	"""
-	def setValue(self, value):
+	def setValue(self, value):#works in 0(1)
 		self.value= value
 		return None
 
@@ -107,7 +103,7 @@ class AVLNode(object):
 	@type h: int
 	@param h: the height
 	"""
-	def setHeight(self, h):
+	def setHeight(self, h):#works in 0(1)
 		self.height = h
 		return None
 
@@ -116,16 +112,32 @@ class AVLNode(object):
 	@rtype: bool
 	@returns: False if self is a virtual node, True otherwise.
 	"""
-	def isRealNode(self):
-		return self.is_ver_node
-
-
-
-
+	def isRealNode(self): #works in 0(1)
+		return self.is_real_node
 """
 A class implementing the ADT list, using an AVL tree.
 """
-
+def mergesort(lst): # works in O(nlog(n)) from intro to cs
+	n = len(lst)
+	if n <= 1:
+		return lst
+	else:
+		return merge(mergesort(lst[0:n//2]), mergesort(lst[n//2:n]))
+def merge(A, B): #from intro to cs, works in O(n+m) where n and m are the length of A and B
+	n = len(A)
+	m = len(B)
+	C = [None for i in range(n+m)]
+	a = 0; b = 0; c = 0
+	while a < n  and b < m:
+		if A[a] < B[b]:
+			C[c] = A[a]
+			a += 1
+		else:
+			C[c] = B[b]
+			b += 1
+		c += 1
+	C[c:] = A[a:] + B[b:]
+	return C
 class AVLTreeList(object):
 
 	"""
@@ -135,28 +147,46 @@ class AVLTreeList(object):
 	def __init__(self):
 		self.size = 0
 		self.root = None
+		self.min = None
 		# add your fields here
 
-
+	def successor(self, node): #finding a node's successor O(log(n))
+		if node.right is None:
+			while node == node.parent.right and node.parent is not None :
+				node = node.parent
+		else:
+			node = node.right
+			while node.left is not None and node.left.is_real_node:
+				node = node.left
+		return node
+	def rank(self, node): # finding a node's rank O(log(n))
+		r = node.left.size + 1
+		x = node
+		while x is not None:
+			if x == x.parent.right:
+				r += x.parent.left.size + 1
+			x = x.parent
+		return r
 	"""returns whether the list is empty
-
 	@rtype: bool
 	@returns: True if the list is empty, False otherwise
 	"""
+
 	def empty(self):
-		if size == 0:
+		if self.size == 0:
 			return True
 		return False
 	def tree_select(self, k):
-		return TreeSelectRec(self.root, k)
-	def tree_select_rec(self,k): ## make sure you dont return virtual leaf
-		r = self.left.size + 1
-		if k == r:
-			return self
-		elif k < r:
-			return tree_select_rec(self.left, k)
-		else:
-			return tree_select_rec(self.right, k-r)
+		def tree_select_rec(node, k):  # make sure you dont return virtual leaf
+			r = node.left.size + 1
+			if k == r:
+				return node
+			elif k < r:
+				return tree_select_rec(node.left, k)
+			else:
+				return tree_select_rec(node.right, k - r)
+		return tree_select_rec(self.root, k)
+
 
 	"""retrieves the value of the i'th item in the list
 
@@ -167,7 +197,7 @@ class AVLTreeList(object):
 	@returns: the the value of the i'th item in the list
 	"""
 	def retrieve(self, i):
-		return tree_select(self.root, i+1)
+		return self.tree_select(i+1)
 
 	"""inserts val at position i in the list
 
@@ -181,10 +211,7 @@ class AVLTreeList(object):
 	"""
 	def insert(self, i, val):
 		to_inset = AVLNode(val)
-
 		return -1
-
-
 	"""deletes the i'th item in the list
 
 	@type i: int
@@ -202,31 +229,44 @@ class AVLTreeList(object):
 	@rtype: str
 	@returns: the value of the first item, None if the list is empty
 	"""
-	def first(self):
-		return None
+	def first(self): #works in O(1)
+		return self.min
 
 	"""returns the value of the last item in the list
 
 	@rtype: str
 	@returns: the value of the last item, None if the list is empty
 	"""
-	def last(self):
-		return None
+	def last(self): #works in O(log(n))
+		if self.size == 0:
+			return None
+		node = self.root
+		while node.right.is_real_node:
+			node = node.right
+		return node
 
 	"""returns an array representing list 
 
 	@rtype: list
 	@returns: a list of strings representing the data structure
 	"""
-	def listToArray(self):
-		return None
-
+	def listToArray(self): # works like inorder walk, O(n) whereas n is the length of the list
+		array = []
+		if self.size == 0:
+			return []
+		def listToArray_rec(node, array):
+			if node.is_real_node is False:
+				return
+			listToArray_rec(node.left, array)
+			array.append(node.value)
+			listToArray_rec(node.right, array)
+		return listToArray_rec(self.root, array)
 	"""returns the size of the list 
 
 	@rtype: int
 	@returns: the size of the list
 	"""
-	def length(self):
+	def length(self): #works in O(1)
 		return self.size
 
 	"""sort the info values of the list
@@ -234,16 +274,26 @@ class AVLTreeList(object):
 	@rtype: list
 	@returns: an AVLTreeList where the values are sorted by the info of the original list.
 	"""
-	def sort(self):
-		return None
+	def sort(self): #works in O(n) because of the listToArray
+		tree_array = self.listToArray()
+		sorted_tree = AVLTreeList
+		sorted_tree_array = mergesort(tree_array)
+		for i in range(len(tree_array)):
+			sorted_tree.insert(i, sorted_tree_array[i])
+		return sorted_tree
 
 	"""permute the info values of the list 
 
 	@rtype: list
 	@returns: an AVLTreeList where the values are permuted randomly by the info of the original list. ##Use Randomness
 	"""
-	def permutation(self):
-		return None
+	def permutation(self): #works in O(n) because of the listToArray
+		permed_tree = AVLTreeList
+		tree_array = self.listToArray()
+		rand_locations = random.sample(range(0, self.size - 1), self.size)
+		for i in range(len(tree_array)):
+			permed_tree.insert(i, tree_array[rand_locations[i]])
+		return permed_tree
 
 	"""concatenates lst to self
 
@@ -252,8 +302,12 @@ class AVLTreeList(object):
 	@rtype: int
 	@returns: the absolute value of the difference between the height of the AVL trees joined
 	"""
-	def concat(self, lst):
-		return None
+	def concat(self, lst): #works in O(log(|n-m|)) whereas n is the size of self and m is the size of lst
+		#follow the algorithm from the class
+		# waiting for barak's "fix from here upward" function
+
+
+		return abs(self.root.height - lst.root.height)
 
 	"""searches for a *value* in the list
 
@@ -262,17 +316,20 @@ class AVLTreeList(object):
 	@rtype: int
 	@returns: the first index that contains val, -1 if not found.
 	"""
-	def search(self, val):
-		return None
-
-
-
+	def search(self, val): #works in O(nlog(n)) proof from recitation 
+		node = self.min
+		if node.value == val:
+			return self.rank(node)
+		while self.successor(node).value != val:
+			node = self.successor(node)
+		if node == self.min: # if after the loop it's still the min then val is not in the list
+			return -1
+		return self.rank(node)
 	"""returns the root of the tree representing the list
 
 	@rtype: AVLNode
 	@returns: the root, None if the list is empty
 	"""
-	def getRoot(self):
+	def getRoot(self): #works in 0(1)
 		return self.root
-
 
