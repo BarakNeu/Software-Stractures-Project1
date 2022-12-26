@@ -1,8 +1,17 @@
 #username - omrikaplan
 #id1      - 319089256
 #name1    - Omri Kaplan
+<<<<<<< Updated upstream
 #id2      - complete info
 #name2    - complete info
+=======
+#id2      - 209422054
+#name2    - Barak Neuberger
+
+import random
+
+
+>>>>>>> Stashed changes
 """A class represnting a node in an AVL tree"""
 import math
 import random
@@ -18,7 +27,11 @@ class AVLNode(object):
 		self.right = None
 		self.parent = None
 		self.size = 1
+<<<<<<< Updated upstream
 		self.height = -1 # Balance factor
+=======
+		self.height = 0  # Balance factor
+>>>>>>> Stashed changes
 		self.is_real_node = True
 
 	"""returns the left child
@@ -114,6 +127,21 @@ class AVLNode(object):
 	"""
 	def isRealNode(self): #works in 0(1)
 		return self.is_real_node
+<<<<<<< Updated upstream
+=======
+
+def CreateVarNode():
+	emptyNode = AVLNode(None)
+	emptyNode.left = None
+	emptyNode.right = None
+	emptyNode.parent = None
+	emptyNode.size = 0
+	emptyNode.height = -1  # Balance factor
+	emptyNode.is_real_node = False
+	return emptyNode
+
+
+>>>>>>> Stashed changes
 """
 A class implementing the ADT list, using an AVL tree.
 """
@@ -150,19 +178,42 @@ class AVLTreeList(object):
 		self.min = None
 		# add your fields here
 
+<<<<<<< Updated upstream
 	def successor(self, node): #finding a node's successor O(log(n))
 		if node.right is None:
 			while node == node.parent.right and node.parent is not None :
 				node = node.parent
+=======
+	def successor(self, node):  # finding a node's successor O(log(n))
+		if node.right.is_real_node is False:
+			parent = node.parent
+			while node == parent.right and parent is not None:
+				node = parent
+				parent = node.parent
+>>>>>>> Stashed changes
 		else:
-			node = node.right
-			while node.left is not None and node.left.is_real_node:
+			while node.left.is_real_node and node.left is not None:
 				node = node.left
 		return node
+<<<<<<< Updated upstream
 	def rank(self, node): # finding a node's rank O(log(n))
+=======
+	def predeccessor(self, node): #same as successor, just swtiching left with right and vise versa. O(log(n))
+		if node.left.is_real_node is False:
+			parent = node.parent
+			while node == parent.left and parent is not None:
+				node = parent
+				parent = node.parent
+		else:
+			while node.right.is_real_node and node.right is not None:
+				node = node.right
+		return node
+
+	def rank(self, node):  # finding a node's rank O(log(n))
+>>>>>>> Stashed changes
 		r = node.left.size + 1
 		x = node
-		while x is not None:
+		while x.parent is not None:
 			if x == x.parent.right:
 				r += x.parent.left.size + 1
 			x = x.parent
@@ -177,7 +228,7 @@ class AVLTreeList(object):
 			return True
 		return False
 	def tree_select(self, k):
-		def tree_select_rec(node, k):  # make sure you dont return virtual leaf
+		def tree_select_rec(node, k):
 			r = node.left.size + 1
 			if k == r:
 				return node
@@ -197,7 +248,11 @@ class AVLTreeList(object):
 	@returns: the the value of the i'th item in the list
 	"""
 	def retrieve(self, i):
+<<<<<<< Updated upstream
 		return self.tree_select(i+1)
+=======
+		return self.tree_select(i+1).value
+>>>>>>> Stashed changes
 
 	"""inserts val at position i in the list
 
@@ -210,8 +265,121 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def insert(self, i, val):
+<<<<<<< Updated upstream
 		to_inset = AVLNode(val)
 		return -1
+=======
+		cnt = 0 #number of balancing fixes
+		toInsert = AVLNode(val)
+		toInsert.right = CreateVarNode()
+		toInsert.left = CreateVarNode()
+		toInsert.right.parent = toInsert
+		toInsert.left.parent = toInsert
+		if self.root is None:
+			self.root = toInsert
+			self.min = toInsert
+			self.root.size += 1
+			self.size += 1
+			return 0
+		if i == 0: #inserting to the start of the list
+			toInsert.parent = self.min
+			self.min.left = toInsert
+			self.min.size += 1
+			self.min.height += 1
+			self.min = toInsert
+			cnt += self.balanceUp(toInsert)
+		if i == self.size: #inserting to the end of the list
+			n = self.root
+			while n.right.isRealNode():
+				n = n.right
+			n.setRight(toInsert)
+			toInsert.setParent(n)
+			n.size += 1
+			n.height += 1
+			cnt += self.balanceUp(toInsert)
+		else:
+			#finding rank i+1 and inserting as left child if that position is open
+			currNode = self.tree_select(i+1)
+			if not currNode.left.isRealNode():
+				currNode.left = toInsert
+				toInsert.setParent(currNode)
+				currNode.size += 1
+				currNode.height += 1
+				## need to run balancing here
+				cnt += self.balanceUp(toInsert)
+			else:
+				#finding i+1's predescessor and inserting as max to it's left sub-tree
+				currNode = self.predeccessor(currNode)
+				currNode.setRight(toInsert)
+				toInsert.parent = currNode
+				currNode.size += 1
+				currNode.height += 1
+				##need to run balancing here
+				cnt += self.balanceUp(toInsert)
+				### just need to update the heights when inserting
+		self.size += 1
+		return cnt
+	def leftRotate(self, z): ##+1 to fixing actions
+		y = z.right
+		T2 = y.left
+		# Perform rotation
+		y.left = z
+		z.right = T2
+		# organize parents
+		y.parent = z.parent
+		z.parent = y
+		T2.parent = z
+		# Update heights
+		z.height = 1 + max(z.left.getHeight(), z.right.getHeight())
+		y.height = 1 + max(y.left.getHeight(), y.right.getHeight())
+		return 1
+	def rightRotate(self, z): ##+1 to fixing actions
+		y = z.left
+		T3 = y.right
+		# Perform rotation
+		y.right = z
+		z.left = T3
+		#origzine parents
+		y.parent = z.parent
+		z.parent = y
+		T3.parent = z
+		# Update heights
+		z.height = 1 + max(self.getHeight(z.left),self.getHeight(z.right))
+		y.height = 1 + max(self.getHeight(y.left),self.getHeight(y.right))
+		# Return the number of corrections done
+		return 1
+
+	def leftRightRotate(self, z): ##+2 to fixing actions
+		self.leftRotate(self, z.left)
+		self.rightRotate(self, z)
+		# Return the number of corrections done
+		return 2
+
+	def rightLeftRotate(self, z): ##+2 to fixing actions
+		self.rightRotate(z.right)
+		self.leftRotate(z)
+		# Return the number of corrections done
+		return 2
+
+	def balanceUp(self, n):
+		cnt = 0
+		n = n.getParent()
+		while n.parent is not None:
+			n = n.getParent()
+			BF = n.left.height - n.right.height
+			if BF == -2 and n.right.left.height - n.right.right.height == -1:
+				cnt += self.leftRotate(n)
+			elif BF == -2 and n.right.left.height - n.right.right.height == 1:
+				cnt += self.rightLeftRotate(n)
+			elif BF == 2 and n.left.left.height - n.left.right.height == -1:
+				cnt += self.leftRightRotate(n)
+			elif BF == 2 and n.left.left.height - n.left.right.height == 1:
+				cnt += self.rightRotate(n)
+			else:
+				continue
+		return cnt
+
+>>>>>>> Stashed changes
 	"""deletes the i'th item in the list
 
 	@type i: int
@@ -221,11 +389,42 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def delete(self, i):
+<<<<<<< Updated upstream
 		return -1
 
+=======
+		cnt = 0
+		currNode = self.tree_select(i+1) #getting to the node
+		needToBalFrom = currNode.parent
+		self.delNode(currNode)
+		cnt += self.balanceUp(needToBalFrom)
+		return cnt
+
+	def delNode(self, currNode): ##returns the node from wise the balanceUp needs to accure
+		if not currNode.right.isRealNode() and not currNode.left.isRealNode():
+			if currNode.parent.right == currNode:
+				currNode.parent.right = CreateVarNode()
+			else:
+				currNode.parent.left = CreateVarNode()
+		elif currNode.right.isRealNode() and currNode.left.isRealNode():
+			suc = self.successor(currNode)
+			## recursive with successor
+			## asked Omri to try
+			self.delNode(suc)
+		elif not currNode.right.isRealNode():
+			if currNode.parent.right == currNode:
+				currNode.parent.right = currNode.left
+			else:
+				currNode.parent.left = currNode.left
+		elif not currNode.left.isRealNode():
+			if currNode.parent.right == currNode:
+				currNode.parent.right = currNode.right
+			else:
+				currNode.parent.left = currNode.right
+		return
+>>>>>>> Stashed changes
 
 	"""returns the value of the first item in the list
-
 	@rtype: str
 	@returns: the value of the first item, None if the list is empty
 	"""
@@ -333,3 +532,8 @@ class AVLTreeList(object):
 	def getRoot(self): #works in 0(1)
 		return self.root
 
+<<<<<<< Updated upstream
+=======
+	def append(self, val):
+		self.insert(self.length(), val)
+>>>>>>> Stashed changes
