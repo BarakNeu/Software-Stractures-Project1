@@ -252,7 +252,6 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def insert(self, i, val):
-		to_inset = AVLNode(val)
 		cnt = 0 #number of balancing fixes
 		toInsert = AVLNode(val)
 		toInsert.right = CreateVarNode()
@@ -270,7 +269,7 @@ class AVLTreeList(object):
 			self.min.left = toInsert
 			self.min = toInsert
 			cnt += self.balanceUp(toInsert.parent)
-		if i == self.size: #inserting to the end of the list
+		elif i == self.size: #inserting to the end of the list
 			n = self.root
 			while n.right.isRealNode():
 				n = n.right
@@ -293,7 +292,7 @@ class AVLTreeList(object):
 		fixSizeUpwards(toInsert)
 		self.size += 1
 		return cnt
-	def leftRotate(self, z): ##+1 to fixing actions
+	def leftRotate(self, z): ##+1 to fixing actions O(1), seems like this one is not working
 		y = z.right
 		T2 = y.left
 		# Perform rotation
@@ -340,6 +339,7 @@ class AVLTreeList(object):
 		n.height += 1
 		while n.getParent() is not None:
 			n = n.getParent()
+			self.root = n
 			BF = n.left.height - n.right.height
 			if BF == -2 and n.right.left.height - n.right.right.height == -1:
 				cnt += self.leftRotate(n)
@@ -354,7 +354,7 @@ class AVLTreeList(object):
 				cnt += self.rightRotate(n)
 				continue
 			else:
-				n.height += 1
+				n.height = 1 + max(n.left.height, n.right.height)
 				continue
 		return cnt
 
