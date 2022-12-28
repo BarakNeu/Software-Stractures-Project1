@@ -75,10 +75,10 @@ class testAVLList(unittest.TestCase):
 
     def check_last(self, tree, lst):
         if not tree.empty():
-            self.assertEqual(tree.tree_select(tree.size-1), lst[-1])
+            self.assertEqual(tree.tree_select(tree.size).value, lst[-1])
         else:
             self.assertEqual(len(lst), 0)
-            self.assertIsNone(tree.tree_select(tree.size-1))
+            self.assertIsNone(tree.retrieve(tree.size))
 
     ###TESTING INSERTION###
 

@@ -121,7 +121,7 @@ class AVLNode(object):
 		return self.is_real_node
 def fixSizeUpwards(node):  #works in O(log(n))
 	while node.parent is not None:
-		node.parent.size += 1
+		node.parent.size = node.parent.right.size + node.parent.left.size + 1
 		node = node.parent
 
 def CreateVarNode(): #works in O(1)
@@ -268,31 +268,26 @@ class AVLTreeList(object):
 			toInsert.parent = self.min
 			self.min.left = toInsert
 			self.min = toInsert
-			cnt += self.balanceUp(toInsert.parent)
 		elif i == self.size: #inserting to the end of the list
 			n = self.root
 			while n.right.isRealNode():
 				n = n.right
 			n.setRight(toInsert)
 			toInsert.setParent(n)
-			cnt += self.balanceUp(toInsert.parent)
-		else:
-			#finding rank i+1 and inserting as left child if that position is open
+		else: #finding rank i+1 and inserting as left child if that position is open
 			currNode = self.tree_select(i+1)
 			if not currNode.left.isRealNode():
 				currNode.left = toInsert
 				toInsert.setParent(currNode)
-				cnt += self.balanceUp(toInsert.parent)
-			else:
-				#finding i+1's predescessor and inserting as max to it's left sub-tree
+			else: #finding i+1's predescessor and inserting as max to it's left sub-tree
 				currNode = self.predeccessor(currNode)
 				currNode.setRight(toInsert)
 				toInsert.parent = currNode
-				cnt += self.balanceUp(toInsert.parent)
+		cnt += self.balanceUp(toInsert.parent)
 		fixSizeUpwards(toInsert)
 		self.size += 1
 		return cnt
-	def leftRotate(self, z): ##+1 to fixing actions O(1), seems like this one is not working
+	def leftRotate(self, z): #+1 to fixing actions O(1)
 		y = z.right
 		T2 = y.left
 		# Perform rotation
@@ -302,9 +297,13 @@ class AVLTreeList(object):
 		y.parent = z.parent
 		z.parent = y
 		T2.parent = z
-		# Update heights
+		if y.parent is not None:
+			y.parent.right = y
+		# Update heights and sizes
 		z.height = 1 + max(z.left.getHeight(), z.right.getHeight())
 		y.height = 1 + max(y.left.getHeight(), y.right.getHeight())
+		z.size = 1 + z.left.size + z.right.size
+		y.size = 1 + y.left.size + y.right.size
 		return 1
 	def rightRotate(self, z): ##+1 to fixing actions
 		y = z.left
@@ -312,18 +311,20 @@ class AVLTreeList(object):
 		# Perform rotation
 		y.right = z
 		z.left = T3
-		#origzine parents
+		# origzine parents
 		y.parent = z.parent
 		z.parent = y
 		T3.parent = z
-		# Update heights
-		z.height = 1 + max(z.left.getHeight(),z.right.getHeight())
-		y.height = 1 + max(y.left.getHeight(),y.right.getHeight())
+		if y.parent is not None:
+			y.parent.left = y
+		# Update heights and sizes
+		z.height = 1 + max(z.left.getHeight(), z.right.getHeight())
+		y.height = 1 + max(y.left.getHeight(), y.right.getHeight())
 		# Return the number of corrections done
 		return 1
 
-	def leftRightRotate(self, z): ##+2 to fixing actions
-		self.leftRotate( z.left)
+	def leftRightRotate(self, z): #+2 to fixing actions
+		self.leftRotate(z.left)
 		self.rightRotate(z)
 		# Return the number of corrections done
 		return 2
@@ -339,7 +340,7 @@ class AVLTreeList(object):
 		n.height += 1
 		while n.getParent() is not None:
 			n = n.getParent()
-			self.root = n
+			n.height = 1 + max(n.left.height, n.right.height)
 			BF = n.left.height - n.right.height
 			if BF == -2 and n.right.left.height - n.right.right.height == -1:
 				cnt += self.leftRotate(n)
@@ -354,8 +355,8 @@ class AVLTreeList(object):
 				cnt += self.rightRotate(n)
 				continue
 			else:
-				n.height = 1 + max(n.left.height, n.right.height)
 				continue
+		self.root = n
 		return cnt
 
 	"""deletes the i'th item in the list
