@@ -174,27 +174,29 @@ class AVLTreeList(object):
 
 
 	def successor(self, node):  # finding a node's successor O(log(n))
-		if node.right.is_real_node is False:
-			parent = node.parent
-			while node == parent.right and parent is not None:
-				node = parent
-				parent = node.parent
-		else:
-			while node.left.is_real_node and node.left is not None:
+		if node.right.is_real_node:
+			node = node.right
+			while node.left.is_real_node:
 				node = node.left
-		return node
-
-	# noinspection DuplicatedCode
-	def predeccessor(self, node): #same as successor, just swtiching left with right and vise versa. O(log(n))
-		if node.left.is_real_node is False:
+			return node
+		parent = node.getParent()
+		while parent is not None and node == parent.right:
+			node = parent
 			parent = node.parent
-			while node == parent.left and parent is not None:
-				node = parent
-				parent = node.parent
-		else:
-			while node.right.is_real_node and node.right is not None:
+		return parent
+
+
+	def predeccessor(self, node): #same as successor, just swtiching left with right and vise versa. O(log(n))
+		if node.left.is_real_node:
+			node = node.left
+			while node.right.is_real_node:
 				node = node.right
-		return node
+			return node
+		parent = node.getParent()
+		while parent is not None and node == parent.left:
+			node = parent
+			parent = node.parent
+		return parent
 
 	def rank(self, node):  # finding a node's rank O(log(n))
 		r = node.left.size + 1
@@ -287,7 +289,7 @@ class AVLTreeList(object):
 		fixSizeUpwards(toInsert)
 		self.size += 1
 		return cnt
-	def leftRotate(self, z): #+1 to fixing actions O(1)
+	def leftRotate(self, z): #+1 to fixing actions O(1), y.right height is not updated
 		y = z.right
 		T2 = y.left
 		# Perform rotation
@@ -320,6 +322,8 @@ class AVLTreeList(object):
 		# Update heights and sizes
 		z.height = 1 + max(z.left.getHeight(), z.right.getHeight())
 		y.height = 1 + max(y.left.getHeight(), y.right.getHeight())
+		z.size = 1 + z.left.size + z.right.size
+		y.size = 1 + y.left.size + y.right.size
 		# Return the number of corrections done
 		return 1
 
@@ -328,7 +332,6 @@ class AVLTreeList(object):
 		self.rightRotate(z)
 		# Return the number of corrections done
 		return 2
-
 	def rightLeftRotate(self, z): ##+2 to fixing actions
 		self.rightRotate(z.right)
 		self.leftRotate(z)

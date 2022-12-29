@@ -97,7 +97,6 @@ class testAVLList(unittest.TestCase):
             L2.insert(0, i)
             self.compare_with_list_by_in_order(T2, L2)
             self.compare_with_list_by_retrieve(T2, L2)
-
         self.check_first(T2, L2)
         self.check_last(T2, L2)
 
@@ -825,9 +824,11 @@ class testAVLList(unittest.TestCase):
     def test_BF_after_insertion_at_middle(self):
         T4 = AVLTreeList()
 
-        for i in range(50):
+        for i in range(2):
+            print(i)
             T4.insert(i//2, i)
             self.in_order(T4, T4.getRoot(), self.check_BF)
+        T4.insert(2 // 2, 2)
 
     def test_BF_after_deletion_from_middle(self):
         T3 = AVLTreeList()
