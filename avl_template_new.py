@@ -488,7 +488,6 @@ class AVLTreeList(object):
 		# waiting for barak's "fix from here upward" function
 		if self.root.height - lst.root.height <= -2:
 			connector = self.last()
-			balance_from = connector.parent
 			self.delNode(connector)
 			self.balanceUp(connector.parent)
 			n = lst.root
@@ -503,12 +502,11 @@ class AVLTreeList(object):
 			self.balanceUp(connector)
 		elif self.root.height - lst.root.height >= 2:
 			connector = lst.first()
-			balance_from = connector.parent
-			self.delNode(connector)
-			self.balanceUp(connector.parent)
+			lst.delNode(connector)
+			lst.balanceUp(connector.parent)
 			n = self.root
 			while n.height > lst.root.height:
-				n.left
+				n.right
 			connector.right = lst.root
 			lst.root.parent = connector
 			connector.left = n
@@ -524,7 +522,6 @@ class AVLTreeList(object):
 			connector.right = lst.root
 			connector.parent = None
 			self.root = connector
-
 
 		return abs(self.root.height - lst.root.height)
 
